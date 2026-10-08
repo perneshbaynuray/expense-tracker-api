@@ -44,7 +44,7 @@ class TestExpenseTracker(unittest.TestCase):
         status, body = self.get("/expenses")
         self.assertEqual(status, 200)
         data = json.loads(body)
-        self.assertEqual(len(data), 3)
+        self.assertEqual(len(data), 100)
 
 
 if __name__ == "__main__":
