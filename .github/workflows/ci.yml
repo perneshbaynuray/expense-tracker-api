@@ -15,7 +15,7 @@ defaults:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   test:
@@ -31,4 +31,32 @@ jobs:
           python-version: "3.12"
 
       - run: ./scripts/test.sh
-  
+
+  publish:
+    name: Build, scan and publish
+    needs: test
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and publish Docker image
+        run: |
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY,,}"
+          docker build -t "$IMAGE:${GITHUB_SHA}" -t "$IMAGE:latest" .
+          docker push "$IMAGE:${GITHUB_SHA}"
+          docker push "$IMAGE:latest"
+
