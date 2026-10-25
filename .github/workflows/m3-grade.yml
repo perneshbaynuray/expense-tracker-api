@@ -1,0 +1,32 @@
+name: M3 Full Grade Check
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  grade:
+    name: Check M3 Score
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Download M3 grader
+        run: |
+          curl -fsSL \
+            https://raw.githubusercontent.com/inf345/inf345-week6-lab/main/mark_m3.py \
+            -o mark_m3.py
+
+      - name: Run M3 grader
+        run: |
+          python3 mark_m3.py --repo https://github.com/perneshbaynuray/expense-tracker-api
