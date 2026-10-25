@@ -4,8 +4,11 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
+RUN pip install --no-cache-dir --upgrade \
+    "msgpack>=1.2.1" \
+    "setuptools>=78.1.1" \
+    "urllib3>=2.8.0" \
+    -r requirements.txt
 COPY . .
 
 ENV PORT=8080
