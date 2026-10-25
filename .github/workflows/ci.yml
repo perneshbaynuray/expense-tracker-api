@@ -20,6 +20,7 @@ jobs:
   test:
     name: Run Python Tests
     runs-on: ubuntu-24.04
+
     steps:
       - uses: actions/checkout@v7
         with:
@@ -29,12 +30,14 @@ jobs:
         with:
           python-version: "3.12"
 
-      - run: ./scripts/test.sh
+      - name: Run tests
+        run: ./scripts/test.sh
 
   publish:
     name: Build, scan and publish
     needs: test
     runs-on: ubuntu-24.04
+
     permissions:
       contents: read
       packages: write
@@ -43,7 +46,6 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-
 
       - name: Log in to GHCR
         if: github.event_name != 'pull_request'
@@ -57,6 +59,15 @@ jobs:
         run: |
           IMAGE="ghcr.io/${GITHUB_REPOSITORY,,}"
           docker build -t "$IMAGE:${GITHUB_SHA}" -t "$IMAGE:latest" -t local-scan:latest .
+
+      - name: Smoke test Docker container
+        run: |
+          docker run -d --name expense-smoke -p 8080:8080 local-scan:latest
+          sleep 3
+          docker ps --filter name=expense-smoke
+          curl --fail --silent --show-error http://localhost:8080/ > /dev/null
+          docker rm -f expense-smoke
+
       - name: Scan Docker image with Trivy
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
@@ -72,4 +83,3 @@ jobs:
           IMAGE="ghcr.io/${GITHUB_REPOSITORY,,}"
           docker push "$IMAGE:${GITHUB_SHA}"
           docker push "$IMAGE:latest"
-
