@@ -1,7 +1,9 @@
-
 import os
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
+
+GREETING = os.environ.get("GREETING", "Expense Tracker API is running")
+API_KEY = os.environ.get("API_KEY", "")
 
 EXPENSES = [
     {"id": 1, "title": "Coffee", "amount": 4.50, "category": "Food"},
@@ -14,7 +16,7 @@ class ExpenseTrackerHandler(BaseHTTPRequestHandler):
         if self.path == "/healthz":
             self._send_response(200, "text/plain", "ok")
         elif self.path == "/":
-            self._send_response(200, "application/json", json.dumps({"message": "Expense Tracker API is running"}))
+            self._send_response(200, "application/json", json.dumps({"message": GREETING}))
         elif self.path == "/expenses":
             self._send_response(200, "application/json", json.dumps(EXPENSES))
         else:
@@ -38,6 +40,3 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", "8080"))
     server = make_server(port)
     server.serve_forever()
-
-       
-
