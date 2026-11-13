@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: expense-config
+data:
+  PORT: "8080"
+  GREETING: "Expense Tracker API is running"
