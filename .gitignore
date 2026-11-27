@@ -5,3 +5,11 @@ __pycache__/
 venv/
 .env
 /tmp/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+*.tfvars
+*.tfplan
+crash.log
