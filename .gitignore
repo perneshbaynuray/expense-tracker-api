@@ -5,7 +5,8 @@ __pycache__/
 venv/
 .env
 /tmp/
-# Terraform: never commit state or local provider cache
+
+# Terraform
 *.tfstate
 *.tfstate.*
 .terraform/
